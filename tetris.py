@@ -72,11 +72,6 @@ def functionbutton():
   if(piecerot > 3):
     piecerot = 0
 
-def leftbutton():
-  global piecex
-  if(not piecex < 1):
-    piecex -= 1
-
 def mainloop():
   global piecex, piecey, pieceid, piecerot
   newpiece()
