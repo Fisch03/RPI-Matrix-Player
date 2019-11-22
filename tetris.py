@@ -55,6 +55,28 @@ piecerot = None
 
 waitingforstart = False
 
+def leftbutton():
+  global piecex
+  if(not piecex < 1):
+    piecex -= 1
+
+def rightbutton():
+  global piecex, piecerot, pieceid
+  piece = rotatepiece(pieces[pieceid], piecerot)
+  if(not piecex > 8 - len(piece[0])):
+    piecex += 1
+
+def functionbutton():
+  global piecerot
+  piecerot += 1
+  if(piecerot > 3):
+    piecerot = 0
+
+def leftbutton():
+  global piecex
+  if(not piecex < 1):
+    piecex -= 1
+
 def mainloop():
   global piecex, piecey, pieceid, piecerot
   newpiece()

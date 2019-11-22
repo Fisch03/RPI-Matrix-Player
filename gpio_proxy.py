@@ -47,6 +47,12 @@ def output(*args, **kwargs):
     else:
         pass
 
+def input(*args, **kwargs):
+    if _rpiLoaded:
+        GPIO.input(*args, **kwargs)
+    else:
+        pass
+
 def add_event_detect(*args, **kwargs):
     if _rpiLoaded:
         GPIO.add_event_detect(*args, **kwargs)

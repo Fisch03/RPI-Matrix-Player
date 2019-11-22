@@ -30,6 +30,16 @@ GPIO.setup(clkpin, GPIO.OUT)
 showpin = 4
 GPIO.setup(showpin, GPIO.OUT)
 
+lbtn = 17
+lbtnlast = False
+GPIO.setup(lbtn, GPIO.IN)
+rbtn = 27
+rbtnlast = False
+GPIO.setup(rbtn, GPIO.IN)
+fnbtn = 22
+fnbtnlast = False
+GPIO.setup(fnbtn, GPIO.IN)
+
 GPIO.output(datapin, True)
 GPIO.output(clkpin, False)
 GPIO.output(showpin, False)
@@ -68,13 +78,39 @@ def matrixloop():
   while getattr(t, "running", True):
     show_matrix()
 
+def buttonmanager():
+  global lbtn, lbtnlast, rbtn, rbtnlast, fnbtn, fnbtnlast
+  lbtncurr = GPIO.input(lbtn)
+  if(not lbtnlast and lbtncurr):
+    game.leftbutton()
+    lbtnlast = True
+  elif(not lbtncurr):
+    lbtnlast = False
+
+  rbtncurr = GPIO.input(rbtn)
+  if(not rbtnlast and rbtncurr):
+    game.rightbutton()
+    rbtnlast = True
+  elif(not rbtncurr):
+    rbtnlast = False
+
+  fnbtncurr = GPIO.input(fnbtn)
+  if(not fnbtnlast and fnbtncurr):
+    game.functionbutton()
+    fnbtnlast = True
+  elif(not fnbtncurr):
+    fnbtnlast = False
+
+
 try:
   print("Setup finished, starting up...")
-  print("Starting GPIO-Matrix and Game Thread...", end="")
+  print("Starting GPIO-Matrix, Button listener and Game Thread...", end="")
   matrixThr = threading.Thread(target=matrixloop)
   matrixThr.start()
   gameThr = threading.Thread(target=game.mainloop)
   gameThr.start()
+  buttonThr = threading.Thread(target=buttonmanager)
+  buttonThr.start()
   print("done")
   if(emulateMatrix):
     print("Starting Virtual Matrix...")
@@ -84,8 +120,9 @@ except KeyboardInterrupt:
   print("Stopping...")
   print("Stopping Threads and cleaning up...", end="")
   GPIO.cleanup()
-  gameThr.running = False
   matrixThr.running = False
+  gameThr.running = False
+  buttonThr.running = False
   if(emulateMatrix):
     vMatrix.close()
   print("done")
