@@ -32,7 +32,7 @@ GPIO.setup(showpin, GPIO.OUT)
 
 lbtn = 17
 lbtnlast = False
-GPIO.setup(lbtn, GPIO.IN)
+GPIO.setup(lbtn, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 rbtn = 27
 rbtnlast = False
 GPIO.setup(rbtn, GPIO.IN)
@@ -49,6 +49,9 @@ print("done")
 emulateMatrix = True
 matrixHTime = 1
 print("Horizontal Time for Matrix is set to {}ms".format(matrixHTime))
+btnups = 50
+print("Buttons will be checked {} times per second".format(btnups))
+
 
 def output_int(number, invert=False):
     binary = format(number, 'b').zfill(8)
@@ -80,27 +83,31 @@ def matrixloop():
 
 def buttonmanager():
   global lbtn, lbtnlast, rbtn, rbtnlast, fnbtn, fnbtnlast
-  lbtncurr = GPIO.input(lbtn)
-  if(not lbtnlast and lbtncurr):
-    game.leftbutton()
-    lbtnlast = True
-  elif(not lbtncurr):
-    lbtnlast = False
+  t = threading.currentThread()
+  while getattr(t, "running", True):
+    global lbtn, lbtnlast, rbtn, rbtnlast, fnbtn, fnbtnlast
+    lbtncurr = GPIO.input(lbtn)
+    if(not lbtnlast and lbtncurr):
+      game.leftbutton()
+      lbtnlast = True
+    elif(not lbtncurr):
+      lbtnlast = False
 
-  rbtncurr = GPIO.input(rbtn)
-  if(not rbtnlast and rbtncurr):
-    game.rightbutton()
-    rbtnlast = True
-  elif(not rbtncurr):
-    rbtnlast = False
+    rbtncurr = GPIO.input(rbtn)
+    if(not rbtnlast and rbtncurr):
+      game.rightbutton()
+      rbtnlast = True
+    elif(not rbtncurr):
+      rbtnlast = False
 
-  fnbtncurr = GPIO.input(fnbtn)
-  if(not fnbtnlast and fnbtncurr):
-    game.functionbutton()
-    fnbtnlast = True
-  elif(not fnbtncurr):
-    fnbtnlast = False
+    fnbtncurr = GPIO.input(fnbtn)
+    if(not fnbtnlast and fnbtncurr):
+      game.functionbutton()
+      fnbtnlast = True
+    elif(not fnbtncurr):
+      fnbtnlast = False
 
+    sleep(1/btnups)
 
 try:
   print("Setup finished, starting up...")

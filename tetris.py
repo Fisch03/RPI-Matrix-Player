@@ -38,15 +38,17 @@ background = [
 ]
 
 gameoverscreen = [
- [1,1,1,1,1,1,1,1],
- [1,1,0,1,1,1,1,1],
- [1,0,0,1,1,1,1,1],
  [0,0,0,0,0,0,0,0],
- [0,0,0,0,0,0,0,0],
- [1,0,0,1,1,1,1,1],
- [1,1,0,1,1,1,1,1],
- [1,1,1,1,1,1,1,1]
+ [0,0,0,1,1,0,0,0],
+ [0,0,0,1,1,0,0,0],
+ [0,0,0,1,1,0,0,0],
+ [0,1,1,1,1,1,1,0],
+ [0,0,1,1,1,1,0,0],
+ [0,0,0,1,1,0,0,0],
+ [0,0,0,0,0,0,0,0]
 ]
+
+ups = 40
 
 piecex = None
 piecey = None
@@ -59,21 +61,35 @@ def leftbutton():
   global piecex
   if(not piecex < 1):
     piecex -= 1
+    if(checkcollision()):
+      piecex += 1
+    drawbackground()
+    drawpiece()
 
 def rightbutton():
   global piecex, piecerot, pieceid
   piece = rotatepiece(pieces[pieceid], piecerot)
-  if(not piecex > 8 - len(piece[0])):
+  if(not piecex > 7 - len(piece[0])):
     piecex += 1
+    if(checkcollision()):
+      piecex -= 1
+    drawbackground()
+    drawpiece()
 
 def functionbutton():
-  global piecerot
-  piecerot += 1
-  if(piecerot > 3):
-    piecerot = 0
+  global piecerot, piecey, waitingforstart
+  piece = rotatepiece(pieces[pieceid], piecerot)
+  if(waitingforstart):
+    waitingforstart = False
+  elif(not piecey > 7 - len(piece)):
+    piecerot += 1
+    if(piecerot > 3):
+      piecerot = 0
+    drawbackground()
+    drawpiece()
 
 def mainloop():
-  global piecex, piecey, pieceid, piecerot
+  global piecex, piecey, pieceid, piecerot, ups
   newpiece()
   t = threading.currentThread()
   while getattr(t, "running", True):
@@ -108,7 +124,10 @@ def gameover():
     sleep(0.1)
   while waitingforstart:
     sleep(0.2)
-  restart()
+  for r in range(0, 8):
+    for c in range(0, 8):
+      background[r][c] = 0
+  newpiece()
 
 def checkandclearrows():
   global background
@@ -169,9 +188,3 @@ def drawbackground():
     for c in range(0, 8):
       if (background[r][c]):
         matrix.set_pixel(c, r)
-
-def restart():
-  newpiece()
-  for r in range(0, 8):
-    for c in range(0, 8):
-      background[r][c] = 0

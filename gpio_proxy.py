@@ -49,7 +49,7 @@ def output(*args, **kwargs):
 
 def input(*args, **kwargs):
     if _rpiLoaded:
-        GPIO.input(*args, **kwargs)
+        return GPIO.input(*args, **kwargs)
     else:
         pass
 
